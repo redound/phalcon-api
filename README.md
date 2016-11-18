@@ -1,2 +1,2 @@
-# phalcon-api
-Phalcon API
+# Phalcon API
+Base library for API features in Phalcon
