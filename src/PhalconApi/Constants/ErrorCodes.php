@@ -22,4 +22,7 @@ class ErrorCodes
     // Data
     const DATA_FAILED = 4010;
     const DATA_NOT_FOUND = 4020;
+
+    const POST_DATA_NOT_PROVIDED = 5010;
+    const POST_DATA_INVALID = 5020;
 }

@@ -81,20 +81,23 @@ class Manager extends \PhalconApi\Mvc\Plugin
     }
 
     /**
-     * @param $name
+     * @param string $accountTypeName
+     * @param string $username
+     * @param string $password
      *
-     * @return \PhalconApi\Auth\AccountType Account-type
+     * @return Session Created session
+     * @throws Exception
+     *
+     * Helper to login with username & password
      */
-    public function getAccountType($name)
+    public function loginWithUsernamePassword($accountTypeName, $username, $password)
     {
-        if (array_key_exists($name, $this->accountTypes)) {
+        return $this->login($accountTypeName, [
 
-            return $this->accountTypes[$name];
-        }
-
-        return false;
+            self::LOGIN_DATA_USERNAME => $username,
+            self::LOGIN_DATA_PASSWORD => $password
+        ]);
     }
-
 
     /**
      * @param string $accountTypeName
@@ -131,22 +134,18 @@ class Manager extends \PhalconApi\Mvc\Plugin
     }
 
     /**
-     * @param string $accountTypeName
-     * @param string $username
-     * @param string $password
+     * @param $name
      *
-     * @return Session Created session
-     * @throws Exception
-     *
-     * Helper to login with username & password
+     * @return \PhalconApi\Auth\AccountType Account-type
      */
-    public function loginWithUsernamePassword($accountTypeName, $username, $password)
+    public function getAccountType($name)
     {
-        return $this->login($accountTypeName, [
+        if (array_key_exists($name, $this->accountTypes)) {
 
-            self::LOGIN_DATA_USERNAME => $username,
-            self::LOGIN_DATA_PASSWORD => $password
-        ]);
+            return $this->accountTypes[$name];
+        }
+
+        return null;
     }
 
     /**
@@ -160,7 +159,8 @@ class Manager extends \PhalconApi\Mvc\Plugin
         try {
 
             $session = $this->tokenParser->getSession($token);
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
 
             throw new Exception(ErrorCodes::AUTH_TOKEN_INVALID);
         }
@@ -182,11 +182,13 @@ class Manager extends \PhalconApi\Mvc\Plugin
             throw new Exception(ErrorCodes::AUTH_SESSION_INVALID);
         }
 
-        if ($account->authenticate($session->getIdentity())) {
+        if (!$account->authenticate($session->getIdentity())) {
 
-            $this->session = $session;
+            throw new Exception(ErrorCodes::AUTH_TOKEN_INVALID);
         }
 
-        return !!$this->session;
+        $this->session = $session;
+
+        return true;
     }
 }

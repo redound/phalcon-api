@@ -31,11 +31,13 @@ class Services
     const ASSETS = "assets";
 
     // PhalconApi
-    const AUTH_MANAGER = 'authManager';
-    const ACL = 'acl';
-    const TOKEN_PARSER = 'tokenParser';
-    const QUERY = 'query';
-    const USER_SERVICE = 'userService';
-    const PHQL_QUERY_PARSER = 'phqlQueryParser';
-    const URL_QUERY_PARSER = 'urlQueryParser';
+    const AUTH_MANAGER = "authManager";
+    const ACL = "acl";
+    const TOKEN_PARSER = "tokenParser";
+    const QUERY = "query";
+    const USER_SERVICE = "userService";
+    const URL_QUERY_PARSER = "urlQueryParser";
+    const ERROR_HELPER = "errorHelper";
+    const FORMAT_HELPER = "formatHelper";
 }
+

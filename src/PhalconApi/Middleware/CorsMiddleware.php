@@ -3,12 +3,15 @@
 namespace PhalconApi\Middleware;
 
 use Phalcon\Events\Event;
+use Phalcon\Mvc\Micro;
+use Phalcon\Mvc\Micro\MiddlewareInterface;
 use PhalconApi\Constants\HttpMethods;
+use PhalconApi\Mvc\Plugin;
 
-class CorsMiddleware extends \PhalconApi\Mvc\Plugin
+class CorsMiddleware extends Plugin implements MiddlewareInterface
 {
-    const ALL_ORIGINS = ['*'];
-    const DEFAULT_HEADERS = ['Content-Type', 'X-Requested-With', 'Authorization'];
+    static $ALL_ORIGINS = ['*'];
+    static $DEFAULT_HEADERS = ['Content-Type', 'X-Requested-With', 'Authorization'];
 
     /**
      * @var array Allowed origins
@@ -33,10 +36,22 @@ class CorsMiddleware extends \PhalconApi\Mvc\Plugin
      * @param array|null $allowedHeaders Allowed headers
      */
     public function __construct(
-        array $allowedOrigins = self::ALL_ORIGINS,
-        array $allowedMethods = HttpMethods::ALL_METHODS,
-        array $allowedHeaders = self::DEFAULT_HEADERS
+        array $allowedOrigins = null,
+        array $allowedMethods = null,
+        array $allowedHeaders = null
     ) {
+        if($allowedOrigins === null){
+            $allowedOrigins = self::$ALL_ORIGINS;
+        }
+
+        if($allowedMethods === null) {
+            $allowedMethods = HttpMethods::$ALL_METHODS;
+        }
+
+        if($allowedHeaders === null){
+            $allowedHeaders = self::$DEFAULT_HEADERS;
+        }
+
         $this->setAllowedOrigins($allowedOrigins);
         $this->setAllowedMethods($allowedMethods);
         $this->setAllowedHeaders($allowedHeaders);
@@ -161,5 +176,10 @@ class CorsMiddleware extends \PhalconApi\Mvc\Plugin
                 $this->response->setHeader('Access-Control-Allow-Headers', implode(',', $this->_allowedHeaders));
             }
         }
+    }
+
+    public function call(Micro $api)
+    {
+        return true;
     }
 }

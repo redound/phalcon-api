@@ -2,16 +2,23 @@
 
 namespace PhalconApi\Middleware;
 
-use Phalcon\Events\Event;
+use Phalcon\Mvc\Micro;
+use Phalcon\Mvc\Micro\MiddlewareInterface;
+use PhalconApi\Mvc\Plugin;
 
-class AuthenticationMiddleware extends \PhalconApi\Mvc\Plugin
+class AuthenticationMiddleware extends Plugin implements MiddlewareInterface
 {
-    public function beforeExecuteRoute(Event $event, \PhalconApi\Api $api)
+    public function beforeExecuteRoute()
     {
         $token = $this->request->getToken();
 
         if ($token) {
             $this->authManager->authenticateToken($token);
         }
+    }
+
+    public function call(Micro $api)
+    {
+        return true;
     }
 }

@@ -6,6 +6,113 @@ use PhalconApi\Constants\PostedDataMethods;
 
 class Request extends \Phalcon\Http\Request
 {
+    protected $postedDataMethod = PostedDataMethods::AUTO;
+
+    /**
+     * @param string $method One of the method constants defined in PostedDataMethods
+     *
+     * @return static
+     */
+    public function postedDataMethod($method)
+    {
+        $this->postedDataMethod = $method;
+        return $this;
+    }
+
+    /**
+     * Sets the posted data method to POST
+     *
+     * @return static
+     */
+    public function expectsPostData()
+    {
+        $this->postedDataMethod(PostedDataMethods::POST);
+        return $this;
+    }
+
+    /**
+     * Sets the posted data method to PUT
+     *
+     * @return static
+     */
+    public function expectsPutData()
+    {
+        $this->postedDataMethod(PostedDataMethods::PUT);
+        return $this;
+    }
+
+    /**
+     * Sets the posted data method to PUT
+     *
+     * @return static
+     */
+    public function expectsGetData()
+    {
+        $this->postedDataMethod(PostedDataMethods::GET);
+        return $this;
+    }
+
+    /**
+     * Sets the posted data method to JSON_BODY
+     *
+     * @return static
+     */
+    public function expectsJsonData()
+    {
+        $this->postedDataMethod(PostedDataMethods::JSON_BODY);
+        return $this;
+    }
+
+    /**
+     * @return string $method One of the method constants defined in PostedDataMethods
+     */
+    public function getPostedDataMethod()
+    {
+        return $this->postedDataMethod;
+    }
+
+    /**
+     * Returns the data posted by the client. This method uses the set postedDataMethod to collect the data.
+     *
+     * @param $httpMethod string Method
+     * @return mixed
+     */
+    public function getPostedData($httpMethod = null)
+    {
+        $method = $httpMethod !== null ? $httpMethod : $this->postedDataMethod;
+
+        if($method == PostedDataMethods::AUTO){
+
+            if ($this->getContentType() === 'application/json') {
+                $method = PostedDataMethods::JSON_BODY;
+            }
+            else if($this->isPost()){
+                $method = PostedDataMethods::POST;
+            }
+            else if($this->isPut()){
+                $method = PostedDataMethods::PUT;
+            }
+            else if($this->isGet()) {
+                $method = PostedDataMethods::GET;
+            }
+        }
+
+        if ($method == PostedDataMethods::JSON_BODY) {
+            return $this->getJsonRawBody(true);
+        }
+        else if($method == PostedDataMethods::POST) {
+            return $this->getPost();
+        }
+        else if($method == PostedDataMethods::PUT) {
+            return $this->getPut();
+        }
+        else if($method == PostedDataMethods::GET) {
+            return $this->getQuery();
+        }
+
+        return [];
+    }
+
     /**
      * Returns auth username
      *
@@ -27,37 +134,6 @@ class Request extends \Phalcon\Http\Request
     }
 
     /**
-     * Returns the data posted by the client. By default this method returns JSON raw body, post or query parameters.
-     * Override this method to provide data from another source.
-     *
-     * @param $method string The method to use (see PostedDataMethods)
-     * @return mixed
-     */
-    public function getPostedData($method=PostedDataMethods::AUTO)
-    {
-        if($method == PostedDataMethods::JSON_BODY){
-            return $this->getJsonRawBody(true);
-        }
-        else if($method == PostedDataMethods::POST){
-            return $this->getPost();
-        }
-        else if($method == PostedDataMethods::AUTO){
-
-            if ($this->getContentType() === 'application/json') {
-                return $this->getJsonRawBody(true);
-            }
-            else if($this->getPost()){
-                return $this->getPost();
-            }
-            else {
-                return $this->getQuery();
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Returns token from the request.
      * Uses token URL query field, or Authorization header
      *
@@ -68,7 +144,7 @@ class Request extends \Phalcon\Http\Request
         $authHeader = $this->getHeader('AUTHORIZATION');
         $authQuery = $this->getQuery('token');
 
-        return ($authQuery ? $authQuery : $this->parseBearerValue($authHeader));
+        return $authQuery ? $authQuery : $this->parseBearerValue($authHeader);
     }
 
     protected function parseBearerValue($string)

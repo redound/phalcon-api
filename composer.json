@@ -1,7 +1,6 @@
 {
     "name": "redound/phalcon-api",
     "description": "Phalcon API Library",
-    "version": "1.0.0",
     "require": {
         "php": ">=5.4",
         "ext-phalcon": ">=1.3.2"
