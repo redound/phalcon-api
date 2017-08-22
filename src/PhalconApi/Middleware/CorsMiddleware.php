@@ -133,23 +133,14 @@ class CorsMiddleware extends Plugin implements MiddlewareInterface
 
             if ($originDomain) {
 
-                $allowed = false;
+                $allowed = in_array($allowedOrigin, $this->_allowedOrigins);
 
-                foreach ($this->_allowedOrigins as $allowedOrigin) {
-
-                    // First try exact domain
-                    if ($originDomain == $allowedOrigin) {
-
-                        $allowed = true;
-                        break;
-                    }
-
+                if (false === $allowed) {
                     // Parse wildcards
                     $expression = '/^' . str_replace('\*', '(.+)', preg_quote($allowedOrigin, '/')) . '$/';
                     if (preg_match($expression, $originDomain) == 1) {
 
                         $allowed = true;
-                        break;
                     }
                 }
 
