@@ -102,13 +102,14 @@ class Manager extends \PhalconApi\Mvc\Plugin
     /**
      * @param string $accountTypeName
      * @param array $data
+     * @param int $sessionDuration
      *
      * @return Session Created session
      * @throws Exception
      *
      * Login a user with the specified account-type
      */
-    public function login($accountTypeName, array $data)
+    public function login($accountTypeName, array $data, $sessionDuration=null)
     {
         if (!$account = $this->getAccountType($accountTypeName)) {
 
@@ -123,8 +124,9 @@ class Manager extends \PhalconApi\Mvc\Plugin
         }
 
         $startTime = time();
+        $duration = $sessionDuration ?: $this->sessionDuration;
 
-        $session = new Session($accountTypeName, $identity, $startTime, $startTime + $this->sessionDuration);
+        $session = new Session($accountTypeName, $identity, $startTime, $startTime + $duration);
         $token = $this->tokenParser->getToken($session);
         $session->setToken($token);
 
