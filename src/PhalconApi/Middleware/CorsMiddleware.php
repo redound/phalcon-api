@@ -11,7 +11,7 @@ use PhalconApi\Mvc\Plugin;
 class CorsMiddleware extends Plugin implements MiddlewareInterface
 {
     static $ALL_ORIGINS = ['*'];
-    static $DEFAULT_HEADERS = ['Content-Type', 'X-Requested-With', 'Authorization'];
+    static $DEFAULT_HEADERS = ['Content-Type', 'X-Requested-With', 'Authorization', 'X-File-Name'];
 
     /**
      * @var array Allowed origins
