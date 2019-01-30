@@ -1,5 +1,5 @@
 {
-    "name": "redound/phalcon-api",
+    "name": "stevie/phalcon-api",
     "description": "Phalcon API Library",
     "version": "2.0.0",
     "require": {
