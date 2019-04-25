@@ -83,7 +83,7 @@ class Request extends \Phalcon\Http\Request
 
         if($method == PostedDataMethods::AUTO){
 
-            if ($this->getContentType() === 'application/json') {
+            if (stristr($this->getContentType(), 'application/json') !== false) {
                 $method = PostedDataMethods::JSON_BODY;
             }
             else if($this->isPost()){
