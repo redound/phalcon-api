@@ -131,6 +131,10 @@ class Request extends \Phalcon\Http\Request
             $this->cachedPostedData = $this->getPostedData();
         }
 
+        if(!$this->cachedPostedData){
+            return null;
+        }
+
         return $this->getHelper($this->cachedPostedData, $name, $filters, $defaultValue, $notAllowEmpty, $noRecursive);
     }
 
