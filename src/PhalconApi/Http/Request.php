@@ -7,6 +7,7 @@ use PhalconApi\Constants\PostedDataMethods;
 class Request extends \Phalcon\Http\Request
 {
     protected $postedDataMethod = PostedDataMethods::AUTO;
+    protected $cachedPostedData = null;
 
     /**
      * @param string $method One of the method constants defined in PostedDataMethods
@@ -111,6 +112,26 @@ class Request extends \Phalcon\Http\Request
         }
 
         return [];
+    }
+
+    /**
+     * Gets a variable from the posted data (getPostedData) applying filters if needed
+     * If no parameters are given the posted data is returned
+     *
+     * @param string $name
+     * @param mixed $filters
+     * @param mixed $defaultValue
+     * @param bool $notAllowEmpty
+     * @param bool $noRecursive
+     * @return mixed
+     */
+    public function getPosted($name = null, $filters = null, $defaultValue = null, $notAllowEmpty = false, $noRecursive = false){
+
+        if(!$this->cachedPostedData){
+            $this->cachedPostedData = $this->getPostedData();
+        }
+
+        return $this->getHelper($this->cachedPostedData, $name, $filters, $defaultValue, $notAllowEmpty, $noRecursive);
     }
 
     /**
