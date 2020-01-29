@@ -15,7 +15,7 @@ trait AclAdapterMountTrait
 
     public function mount(\PhalconApi\Acl\MountableInterface $mountable)
     {
-        if ($this instanceof \Phalcon\Acl\AdapterInterface) {
+        if ($this instanceof \Phalcon\Acl\Adapter\AdapterInterface) {
 
             $resources = $mountable->getAclResources();
             $rules = $mountable->getAclRules($this->getRoles());
