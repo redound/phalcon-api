@@ -6,9 +6,9 @@ use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\Micro\MiddlewareInterface;
 use PhalconApi\Constants\ErrorCodes;
 use PhalconApi\Exception;
-use PhalconApi\Mvc\Plugin;
+use PhalconApi\Mvc\DiInjectable;
 
-class NotFoundMiddleware extends Plugin implements MiddlewareInterface
+class NotFoundMiddleware extends DiInjectable implements MiddlewareInterface
 {
     public function beforeNotFound()
     {

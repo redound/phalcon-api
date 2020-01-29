@@ -4,9 +4,9 @@ namespace PhalconApi\Middleware;
 
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\Micro\MiddlewareInterface;
-use PhalconApi\Mvc\Plugin;
+use PhalconApi\Mvc\DiInjectable;
 
-class AuthenticationMiddleware extends Plugin implements MiddlewareInterface
+class AuthenticationMiddleware extends DiInjectable implements MiddlewareInterface
 {
     public function beforeExecuteRoute()
     {

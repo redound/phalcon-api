@@ -4,9 +4,9 @@ namespace PhalconApi\Middleware;
 
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\Micro\MiddlewareInterface;
-use PhalconApi\Mvc\Plugin;
+use PhalconApi\Mvc\DiInjectable;
 
-class OptionsResponseMiddleware extends Plugin implements MiddlewareInterface
+class OptionsResponseMiddleware extends DiInjectable implements MiddlewareInterface
 {
     public function beforeHandleRoute()
     {

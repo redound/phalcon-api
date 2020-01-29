@@ -19,8 +19,8 @@ interface MountableInterface
      * Returns the ACL rules in the following format:
      *
      * [
-     *   Acl::ALLOW => [['rolename', 'resourcename', 'endpointname], ['rolename', 'resourcename', 'endpointname]],
-     *   Acl::DENY => [['rolename', 'resourcename', 'endpointname], ['rolename', 'resourcename', 'endpointname]]
+     *   Enum::ALLOW => [['rolename', 'resourcename', 'endpointname], ['rolename', 'resourcename', 'endpointname]],
+     *   Enum::DENY => [['rolename', 'resourcename', 'endpointname], ['rolename', 'resourcename', 'endpointname]]
      * ]
      *
      * @param array $roles The currently registered role on the ACL

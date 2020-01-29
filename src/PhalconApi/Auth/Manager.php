@@ -5,7 +5,7 @@ namespace PhalconApi\Auth;
 use PhalconApi\Constants\ErrorCodes;
 use PhalconApi\Exception;
 
-class Manager extends \PhalconApi\Mvc\Plugin
+class Manager extends \PhalconApi\Mvc\DiInjectable
 {
     const LOGIN_DATA_USERNAME = "username";
     const LOGIN_DATA_PASSWORD = "password";
