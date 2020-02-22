@@ -5,9 +5,9 @@ namespace PhalconApi\Middleware;
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\Micro\MiddlewareInterface;
 use PhalconApi\Constants\Services;
-use PhalconApi\Mvc\Plugin;
+use PhalconApi\Mvc\DiInjectable;
 
-class UrlQueryMiddleware extends Plugin implements MiddlewareInterface
+class UrlQueryMiddleware extends DiInjectable implements MiddlewareInterface
 {
     public function beforeExecuteRoute()
     {

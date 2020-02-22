@@ -2,7 +2,7 @@
 
 namespace PhalconApi\Acl;
 
-interface MountingEnabledAdapterInterface extends \Phalcon\Acl\AdapterInterface
+interface MountingEnabledAdapterInterface extends \Phalcon\Acl\Adapter\AdapterInterface
 {
     /**
      * Mounts the mountable object onto the ACL

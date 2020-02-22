@@ -6,9 +6,9 @@ use Phalcon\Events\Event;
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\Micro\MiddlewareInterface;
 use PhalconApi\Constants\HttpMethods;
-use PhalconApi\Mvc\Plugin;
+use PhalconApi\Mvc\DiInjectable;
 
-class CorsMiddleware extends Plugin implements MiddlewareInterface
+class CorsMiddleware extends DiInjectable implements MiddlewareInterface
 {
     static $ALL_ORIGINS = ['*'];
     static $DEFAULT_HEADERS = ['Content-Type', 'X-Requested-With', 'Authorization', 'X-File-Name'];

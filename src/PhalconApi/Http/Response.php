@@ -2,6 +2,7 @@
 
 namespace PhalconApi\Http;
 
+use Phalcon\Http\ResponseInterface;
 use PhalconApi\Constants\Services;
 use PhalconApi\Exception;
 
@@ -58,11 +59,13 @@ class Response extends \Phalcon\Http\Response
         $this->setStatusCode($statusCode);
     }
 
-    public function setJsonContent($content, $jsonOptions = 0, $depth = 512)
+    public function setJsonContent($content, int $jsonOptions = 0, int $depth = 512): ResponseInterface
     {
-        parent::setJsonContent($content, $jsonOptions, $depth);
+        $result = parent::setJsonContent($content, $jsonOptions, $depth);
 
         $this->setContentType('application/json', 'UTF-8');
         $this->setHeader('E-Tag', md5($this->getContent()));
+
+        return $result;
     }
 }

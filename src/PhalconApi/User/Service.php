@@ -4,9 +4,9 @@ namespace PhalconApi\User;
 
 use PhalconApi\Constants\ErrorCodes;
 use PhalconApi\Exception;
-use PhalconApi\Mvc\Plugin;
+use PhalconApi\Mvc\DiInjectable;
 
-class Service extends Plugin
+class Service extends DiInjectable
 {
     /**
      * Returns details for the current user, e.g. a User model
