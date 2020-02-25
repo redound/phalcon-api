@@ -126,26 +126,30 @@ class CorsMiddleware extends DiInjectable implements MiddlewareInterface
 
         if ($originIsWildcard) {
             $originValue = '*';
-        } else {
+        }
+        else {
 
             $origin = $this->request->getHeader('Origin');
             $originDomain = $origin ? parse_url($origin, PHP_URL_HOST) : null;
 
             if ($originDomain) {
 
-                $allowed = in_array($allowedOrigin, $this->_allowedOrigins);
+                $allowed = in_array($originDomain, $this->_allowedOrigins);
 
-                if (false === $allowed) {
-                    // Parse wildcards
-                    $expression = '/^' . str_replace('\*', '(.+)', preg_quote($allowedOrigin, '/')) . '$/';
-                    if (preg_match($expression, $originDomain) == 1) {
+                if (!$allowed) {
 
-                        $allowed = true;
+                    foreach($this->_allowedOrigins as $allowedOrigin) {
+
+                        $expression = '/^' . str_replace('\*', '(.+)', preg_quote($allowedOrigin, '/')) . '$/';
+
+                        if (preg_match($expression, $originDomain) == 1) {
+                            $allowed = true;
+                            break;
+                        }
                     }
                 }
 
                 if ($allowed) {
-
                     $originValue = $origin;
                 }
             }
