@@ -8,7 +8,7 @@ use PhalconApi\Mvc\DiInjectable;
 
 class AuthenticationMiddleware extends DiInjectable implements MiddlewareInterface
 {
-    public function beforeExecuteRoute()
+    public function beforeHandleRoute()
     {
         $token = $this->request->getToken();
 
