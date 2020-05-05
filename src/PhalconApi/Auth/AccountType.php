@@ -12,9 +12,9 @@ interface AccountType
     public function login($data);
 
     /**
-     * @param string $identity Identity
+     * @param Session $session Session
      *
      * @return bool Authentication successful
      */
-    public function authenticate($identity);
+    public function authenticate(Session $session);
 }

@@ -184,7 +184,7 @@ class Manager extends \PhalconApi\Mvc\DiInjectable
             throw new Exception(ErrorCodes::AUTH_SESSION_INVALID);
         }
 
-        if (!$account->authenticate($session->getIdentity())) {
+        if (!$account->authenticate($session)) {
 
             throw new Exception(ErrorCodes::AUTH_TOKEN_INVALID);
         }
