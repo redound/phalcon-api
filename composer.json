@@ -1,7 +1,7 @@
 {
     "name": "redound/phalcon-api",
     "description": "Phalcon API Library",
-    "version": "3.0.1",
+    "version": "4.0.0",
     "require": {
         "php": ">=7.1",
         "ext-phalcon": ">=4.0.0"
@@ -10,10 +10,6 @@
         "firebase/php-jwt": "^5.0"
     },
     "authors": [
-        {
-            "name": "Olivier Andriessen",
-            "email": "olivierandriessen@gmail.com"
-        },
         {
             "name": "Bart Blok",
             "email": "bart@wittig.nl"
