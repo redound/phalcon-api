@@ -112,6 +112,6 @@ class JWTTokenParser implements \PhalconApi\Auth\TokenParserInterface
 
     public function decode($token)
     {
-        return \Firebase\JWT\JWT::decode($token, $this->secret, [$this->algorithm]);
+        return \Firebase\JWT\JWT::decode($token, new \Firebase\JWT\Key($this->secret, $this->algorithm));
     }
 }
