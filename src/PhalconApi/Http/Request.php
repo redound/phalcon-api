@@ -164,7 +164,7 @@ class Request extends \Phalcon\Http\Request
      *
      * @return string|null
      */
-    public function getToken()
+    public function getToken(): ?string
     {
         $authHeader = $this->getHeader('AUTHORIZATION');
         $authQuery = $this->getQuery('token');
@@ -172,9 +172,9 @@ class Request extends \Phalcon\Http\Request
         return $authQuery ? $authQuery : $this->parseBearerValue($authHeader);
     }
 
-    protected function parseBearerValue($string)
+    protected function parseBearerValue(?string $string): ?string
     {
-        if (strpos(trim($string), 'Bearer') !== 0) {
+        if (!$string || strpos(trim($string), 'Bearer') !== 0) {
             return null;
         }
 
