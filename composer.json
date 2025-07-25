@@ -1,13 +1,13 @@
 {
     "name": "redound/phalcon-api",
     "description": "Phalcon API Library",
-    "version": "5.0.0",
+    "version": "6.0.0",
     "require": {
-        "php": ">=8.0",
+        "php": ">=8.4",
         "ext-phalcon": ">=5.0.0"
     },
     "suggest": {
-        "firebase/php-jwt": "^5.0"
+        "firebase/php-jwt": "^6.8.1"
     },
     "authors": [
         {
