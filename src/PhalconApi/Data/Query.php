@@ -25,6 +25,7 @@ class Query
     protected $conditions = [];
     protected $sorters = [];
     protected $excludes = [];
+    protected $groups = [];
 
     public function __construct()
     {
@@ -46,6 +47,12 @@ class Query
     public function addSorter(Sorter $sorter)
     {
         $this->sorters[] = $sorter;
+        return $this;
+    }
+
+    public function addGroup($group)
+    {
+        $this->groups[] = $group;
         return $this;
     }
 
@@ -73,6 +80,10 @@ class Query
 
         if ($query->hasExcludes()) {
             $this->addManyExcludes($query->getExcludes());
+        }
+
+        if ($query->hasGroups()) {
+            $this->addManyGroups($query->getGroups());
         }
 
         return $this;
@@ -172,5 +183,21 @@ class Query
     public function getExcludes()
     {
         return $this->excludes;
+    }
+
+    public function hasGroups()
+    {
+        return !empty($this->groups);
+    }
+
+    public function addManyGroups($groups)
+    {
+        $this->groups = array_merge($this->groups, $groups);
+        return $this;
+    }
+
+    public function getGroups()
+    {
+        return $this->groups;
     }
 }
