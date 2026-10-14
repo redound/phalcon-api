@@ -69,6 +69,11 @@ class Manager extends \PhalconApi\Mvc\DiInjectable
         $this->session = $session;
     }
 
+    public function resetSession(): void
+    {
+        $this->session = null;
+    }
+
 
     /**
      * @return bool
@@ -111,6 +116,8 @@ class Manager extends \PhalconApi\Mvc\DiInjectable
      */
     public function login($accountTypeName, array $data, $sessionDuration=null)
     {
+        $this->resetSession();
+
         if (!$account = $this->getAccountType($accountTypeName)) {
 
             throw new Exception(ErrorCodes::AUTH_INVALID_ACCOUNT_TYPE);
@@ -158,6 +165,8 @@ class Manager extends \PhalconApi\Mvc\DiInjectable
      */
     public function authenticateToken($token)
     {
+        $this->resetSession();
+
         try {
 
             $session = $this->tokenParser->getSession($token);

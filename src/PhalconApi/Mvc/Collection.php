@@ -4,7 +4,7 @@ namespace PhalconApi\Mvc;
 
 use Phalcon\Acl\Enum;
 use PhalconApi\Acl\MountableInterface;
-use PhalconApi\Http\Request;
+use PhalconApi\Constants\HttpMethods;
 
 class Collection extends \Phalcon\Mvc\Micro\Collection implements MountableInterface
 {
@@ -83,24 +83,17 @@ class Collection extends \Phalcon\Mvc\Micro\Collection implements MountableInter
     }
 
 
+    public function getAclResource(int $index): string
+    {
+        return 'route:' . spl_object_id($this) . ':' . $index;
+    }
+
     public function getAclResources()
     {
         $resources = [];
 
-        foreach($this->handlers as $handler){
-
-            $methods = $handler[0];
-            if(!is_array($methods)){
-                $methods = [$methods];
-            }
-
-            $path = $this->getFullPath($handler[1]);
-            $resources[] = [$path, $methods];
-
-            $name = $handler[3];
-            if($name){
-                $resources[] = [$name, $methods];
-            }
+        foreach ($this->handlers as $index => $handler) {
+            $resources[] = [$this->getAclResource($index), $this->getAclMethods($handler)];
         }
 
         return $resources;
@@ -108,55 +101,116 @@ class Collection extends \Phalcon\Mvc\Micro\Collection implements MountableInter
 
     public function getAclRules(array $roles)
     {
-        $resources = $this->getAclResources();
-
         $allowed = [];
         $denied = [];
+        $roleNames = [];
 
-        // Allow
-        foreach($this->_allowedRoles as $role){
+        foreach ($roles as $role) {
+            $roleNames[] = is_object($role) ? $role->getName() : $role;
+        }
 
-            foreach($resources as $resource) {
-                $allowed[] = [$role, $resource[0], '*'];
+        $this->validateAclRules($roleNames);
+
+        foreach ($this->handlers as $index => $handler) {
+            $resource = $this->getAclResource($index);
+
+            foreach ($roleNames as $role) {
+                foreach ($this->getAclMethods($handler) as $method) {
+                    $allow = $this->matchesRoles($this->_allowedRoles, $role)
+                        || $this->matchesRules($this->_allowedNameRules, $handler[3], $role, $method)
+                        || $this->matchesRules($this->_allowedPathRules, $handler[1], $role, $method);
+                    $deny = $this->matchesRoles($this->_deniedRoles, $role)
+                        || $this->matchesRules($this->_deniedNameRules, $handler[3], $role, $method)
+                        || $this->matchesRules($this->_deniedPathRules, $handler[1], $role, $method);
+
+                    if ($deny) {
+                        $denied[] = [$role, $resource, $method];
+                    }
+                    elseif ($allow) {
+                        $allowed[] = [$role, $resource, $method];
+                    }
+                }
             }
-        }
-
-        foreach($this->_allowedNameRules as $rule){
-
-            list($role, $name, $methods) = $rule;
-            $allowed[] = [$role, $name, $methods ?: '*'];
-        }
-
-        foreach ($this->_allowedPathRules as $rule) {
-
-            list($role, $path, $methods) = $rule;
-            $allowed[] = [$role, $this->getFullPath($path), $methods ?: '*'];
-        }
-
-        // Deny
-        foreach($this->_deniedRoles as $role){
-
-            foreach($resources as $resource) {
-                $denied[] = [$role, $resource[0], '*'];
-            }
-        }
-
-        foreach($this->_deniedNameRules as $rule){
-
-            list($role, $name, $methods) = $rule;
-            $denied[] = [$role, $name, $methods ?: '*'];
-        }
-
-        foreach ($this->_deniedPathRules as $rule) {
-
-            list($role, $path, $methods) = $rule;
-            $denied[] = [$role, $this->getFullPath($path), $methods ?: '*'];
         }
 
         return [
             Enum::ALLOW => $allowed,
             Enum::DENY => $denied
         ];
+    }
+
+    protected function getAclMethods(array $handler): array
+    {
+        $methods = $handler[0];
+
+        if ($methods === null || $methods === '*') {
+            $methods = HttpMethods::$ALL_METHODS;
+        }
+        elseif (!is_array($methods)) {
+            $methods = [$methods];
+        }
+
+        return $methods;
+    }
+
+    protected function matchesRoles(array $roles, $role): bool
+    {
+        return in_array($role, $roles, true) || in_array('*', $roles, true);
+    }
+
+    protected function matchesRules(array $rules, $target, $role, $method): bool
+    {
+        if ($target === null) {
+            return false;
+        }
+
+        foreach ($rules as $rule) {
+            list($ruleRole, $ruleTarget, $methods) = $rule;
+
+            if ($ruleRole !== $role && $ruleRole !== '*') {
+                continue;
+            }
+
+            if ($ruleTarget !== $target && $ruleTarget !== '*') {
+                continue;
+            }
+
+            if (!$methods || in_array('*', (array) $methods, true) || in_array($method, (array) $methods, true)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function validateAclRules(array $roles): void
+    {
+        $names = array_column($this->handlers, 3);
+        $paths = array_column($this->handlers, 1);
+        $configuredRoles = array_merge($this->_allowedRoles, $this->_deniedRoles);
+
+        $ruleGroups = [
+            [$this->_allowedNameRules, $names],
+            [$this->_deniedNameRules, $names],
+            [$this->_allowedPathRules, $paths],
+            [$this->_deniedPathRules, $paths]
+        ];
+
+        foreach ($ruleGroups as [$rules, $targets]) {
+            foreach ($rules as $rule) {
+                $configuredRoles[] = $rule[0];
+
+                if ($rule[1] !== '*' && !in_array($rule[1], $targets, true)) {
+                    throw new \InvalidArgumentException('ACL rule references an unknown route "' . $rule[1] . '"');
+                }
+            }
+        }
+
+        foreach ($configuredRoles as $role) {
+            if ($role !== '*' && !in_array($role, $roles, true)) {
+                throw new \InvalidArgumentException('ACL rule references an unknown role "' . $role . '"');
+            }
+        }
     }
 
     protected function getFullPath($path){

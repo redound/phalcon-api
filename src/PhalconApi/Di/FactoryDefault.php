@@ -4,7 +4,8 @@ namespace PhalconApi\Di;
 
 use PhalconApi\Acl\Adapter\Memory as Acl;
 use PhalconApi\Auth\Manager as AuthManager;
-use PhalconApi\Auth\TokenParsers\JWTTokenParser;
+use PhalconApi\Auth\TokenParserInterface;
+use PhalconApi\Constants\ErrorCodes;
 use PhalconApi\Constants\Services;
 use PhalconApi\Data\Query;
 use PhalconApi\Data\Query\QueryParsers\UrlQueryParser;
@@ -12,11 +13,12 @@ use PhalconApi\Helpers\ErrorHelper;
 use PhalconApi\Helpers\FormatHelper;
 use PhalconApi\Http\Request;
 use PhalconApi\Http\Response;
+use PhalconApi\Exception;
 use PhalconApi\User\Service as UserService;
 
 class FactoryDefault extends \Phalcon\Di\FactoryDefault
 {
-    public function __construct()
+    public function __construct(?TokenParserInterface $tokenParser = null)
     {
         parent::__construct();
 
@@ -27,9 +29,9 @@ class FactoryDefault extends \Phalcon\Di\FactoryDefault
 
         $this->setShared(Services::USER_SERVICE, new UserService);
 
-        $this->setShared(Services::TOKEN_PARSER, function () {
+        $this->setShared(Services::TOKEN_PARSER, $tokenParser ?? function () {
 
-            return new JWTTokenParser('this_should_be_changed');
+            throw new Exception(ErrorCodes::GENERAL_SYSTEM, 'Configure an explicit token parser before authentication');
         });
 
         $this->setShared(Services::QUERY, new Query);

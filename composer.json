@@ -7,7 +7,13 @@
         "ext-phalcon": ">=5.0.0"
     },
     "suggest": {
-        "firebase/php-jwt": "^6.8.1"
+        "firebase/php-jwt": "^7.2.1"
+    },
+    "require-dev": {
+        "firebase/php-jwt": "^7.2.1"
+    },
+    "scripts": {
+        "test": "php tests/security.php"
     },
     "authors": [
         {

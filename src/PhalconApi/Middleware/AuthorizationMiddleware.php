@@ -5,7 +5,7 @@ namespace PhalconApi\Middleware;
 use Phalcon\Mvc\Micro;
 use PhalconApi\Constants\ErrorCodes;
 use PhalconApi\Constants\Services;
-use PhalconApi\Mvc\Collection;
+use PhalconApi\Api;
 use PhalconApi\Mvc\DiInjectable;
 use Phalcon\Mvc\Micro\MiddlewareInterface;
 use PhalconApi\Exception;
@@ -30,18 +30,10 @@ class AuthorizationMiddleware extends DiInjectable implements MiddlewareInterfac
         }
 
         $role = $userService->getRole();
-        $name = $route->getName();
-        $path = $route->getPattern();
+        $resource = $app instanceof Api ? $app->getRouteAclResource($route) : $route->getPattern();
         $method = $request->getMethod();
 
-        $allowedPath = $acl->isAllowed($role, $path, $method);
-
-        $allowedName = false;
-        if($name){
-            $allowedName = $acl->isAllowed($role, $name, $method);
-        }
-
-        if (!$allowedPath && !$allowedName) {
+        if (!$acl->isAllowed($role, $resource, $method)) {
             throw new Exception(ErrorCodes::ACCESS_DENIED, 'No access to path "' . $route->getPattern() . '"');
         }
 

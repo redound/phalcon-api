@@ -10,6 +10,8 @@ class AuthenticationMiddleware extends DiInjectable implements MiddlewareInterfa
 {
     public function beforeHandleRoute()
     {
+        $this->authManager->resetSession();
+
         $token = $this->request->getToken();
 
         if ($token) {

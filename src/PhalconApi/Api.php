@@ -5,6 +5,8 @@ namespace PhalconApi;
 use Phalcon\Acl\Enum as AclEnum;
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\Micro\CollectionInterface;
+use Phalcon\Mvc\Router\RouteInterface;
+use PhalconApi\Mvc\Collection;
 use PhalconApi\Constants\Services;
 use PhalconApi\Acl\MountableInterface;
 
@@ -25,6 +27,7 @@ use PhalconApi\Acl\MountableInterface;
 class Api extends Micro implements MountableInterface
 {
     protected $_collections = [];
+    protected $_routeResources = [];
 
     /**
      * Attaches middleware to the API
@@ -44,10 +47,51 @@ class Api extends Micro implements MountableInterface
         return $this;
     }
 
-    public function mount(CollectionInterface $collection): Micro
+    public function mount(CollectionInterface $collection): static
     {
+        if (in_array($collection, $this->_collections, true)) {
+            throw new \InvalidArgumentException('A collection can only be mounted once');
+        }
+
+        $names = [];
+
+        foreach ($this->getRouter()->getRoutes() as $route) {
+            if ($route->getName() !== null) {
+                $names[$route->getName()] = true;
+            }
+        }
+
+        foreach ($collection->getHandlers() as $handler) {
+            $name = $handler[3];
+
+            if ($name !== null) {
+                if (isset($names[$name])) {
+                    throw new \InvalidArgumentException('Duplicate route name "' . $name . '"');
+                }
+
+                $names[$name] = true;
+            }
+        }
+
+        $routeCount = count($this->getRouter()->getRoutes());
+        parent::mount($collection);
+
+        if ($collection instanceof Collection) {
+            $routes = array_slice($this->getRouter()->getRoutes(), $routeCount);
+
+            foreach ($routes as $index => $route) {
+                $this->_routeResources[$route->getRouteId()] = $collection->getAclResource($index);
+            }
+        }
+
         $this->_collections[] = $collection;
-        return parent::mount($collection);
+
+        return $this;
+    }
+
+    public function getRouteAclResource(RouteInterface $route): string
+    {
+        return $this->_routeResources[$route->getRouteId()] ?? $route->getPattern();
     }
 
     public function getAclResources()
