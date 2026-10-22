@@ -44,7 +44,7 @@ class Api extends Micro implements MountableInterface
         return $this;
     }
 
-    public function mount(CollectionInterface $collection): Micro
+    public function mount(CollectionInterface $collection): static
     {
         $this->_collections[] = $collection;
         return parent::mount($collection);
